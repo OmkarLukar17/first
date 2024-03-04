@@ -18,3 +18,11 @@ steps:
     echo See https://aka.ms/yaml
     ./first/test.sh
   displayName: 'Run a multi-line script'
+
+resources:
+ repositories:
+   - repository: first
+     type: github
+     endpoint: OmkarLukar17
+     name: OmkarLukar17/first
+     ref: main
