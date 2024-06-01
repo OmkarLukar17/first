@@ -1,0 +1,99 @@
+/* .post{
+    width: 375px;
+    margin: 0 25px 40px 25px;
+} */
+
+.justpost {
+  
+    /* border: 2px solid green; */
+    /* height: 280px; */
+    /* border: 1px solid black; */
+    border-radius: 10px;
+    border-style: inset;
+    margin: 10px;
+    height: 370px;
+    width: 280px;
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* card image */
+.postImg{
+    height: 170px;
+    width: 250px;
+    object-fit: cover;
+    border-radius: 7px ;
+    border: 1px solid red;
+    margin: 10px;
+}
+
+/* post info */
+.postInfo{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+.postCat{
+    margin-top:13px;
+    font-family: 'Varela Round', sans-serif;
+    font-size: 11px;
+    color: #be9656;
+    line-height: 20px;
+     margin-right: 10px;
+    cursor: pointer;
+}
+.postTitle{
+    font-family: 'Josefin Sans', sans-serif;
+    font-size:24px ;
+    font-weight: 700;
+    margin-top: 15px;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    width: 267px;
+    
+    overflow: hidden;
+    white-space: nowrap;
+    
+}
+
+.postDate{
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #999;
+    margin-top: 15px;
+}
+.postdisc{
+    font-family: 'Varela Round', sans-serif;
+    font-size: 14px;
+    width: 267px;
+    white-space: nowrap;
+
+    color: #444;
+    line-height: 24px;
+    margin: 6px 6px;
+    overflow: hidden;
+     
+   
+    text-overflow: ellipsis;
+    /* display: -webkit-box; */
+    -webkit-line-clamp: 4;
+    -webkit-box-orient:vertical;
+
+}
+
+.timeNcat{
+    display: flex;
+    justify-content: space-between;
+    width: 255px;
+    margin-top: -10px;
+}
+
+.postCats{
+    margin-top: 13px;
+}
