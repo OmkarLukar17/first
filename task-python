@@ -1,0 +1,41 @@
+import requests
+import json
+
+# Replace with your Azure DevOps organization name and personal access token
+organization = 'your_organization_name'
+project = 'your_project_name'
+token = 'your_personal_access_token'
+
+# The Work Items - Create endpoint URL
+url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/$Task?api-version=6.0"
+
+# Headers for the request
+headers = {
+    "Content-Type": "application/json-patch+json",
+    "Authorization": f"Bearer {token}"
+}
+
+# The task details
+task_details = {
+    "fields": {
+        "System.Title": "Sample Task",  # Title of the task
+        "System.Description": "This is a sample task created via the API.",  # Description of the task
+        "System.AssignedTo": "user_email@example.com",  # Assign the task to a user
+        "System.State": "Active",  # State of the task
+        "System.AreaPath": "your_project_name",  # Area path of the task
+        "System.IterationPath": "your_project_name",  # Iteration path of the task
+        "Microsoft.VSTS.Common.Priority": "1",  # Priority of the task
+        "System.Tags": "Tag1;Tag2"  # Tags for the task
+    }
+}
+
+# Make the POST request to create the task
+response = requests.post(url, headers=headers, json=[task_details])
+
+# Check if the request was successful
+if response.status_code == 200:
+    print("Task created successfully.")
+    print(response.json())
+else:
+    print("Failed to create task.")
+    print(response.text)
