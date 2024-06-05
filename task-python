@@ -1,41 +1,100 @@
+import pandas as pd
 import requests
+from requests.auth import HTTPBasicAuth
 import json
 
-# Replace with your Azure DevOps organization name and personal access token
-organization = 'your_organization_name'
-project = 'your_project_name'
-token = 'your_personal_access_token'
+# Azure DevOps organization URL and personal access token
+organization_url = 'https://dev.azure.com/st/'
+personal_access_token = 'k6db4ty63p5fhcq'
+project_name = 'Pytct'
+work_item_type = 'Task'
 
-# The Work Items - Create endpoint URL
-url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/workitems/$Task?api-version=6.0"
+# Read tasks from CSV file
+csv_file_path = 'task.xlsx'
+tasks_df = pd.read_excel(csv_file_path)
 
-# Headers for the request
+# Define the URL for creating work items
+create_work_item_url = f'{organization_url}/{project_name}/_apis/wit/workitems/${work_item_type}?api-version=6.0'
+
+# Define headers for the HTTP requests
 headers = {
-    "Content-Type": "application/json-patch+json",
-    "Authorization": f"Bearer {token}"
+    'Content-Type': 'application/json-patch+json',
+    'Accept': 'application/json',
 }
 
-# The task details
-task_details = {
-    "fields": {
-        "System.Title": "Sample Task",  # Title of the task
-        "System.Description": "This is a sample task created via the API.",  # Description of the task
-        "System.AssignedTo": "user_email@example.com",  # Assign the task to a user
-        "System.State": "Active",  # State of the task
-        "System.AreaPath": "your_project_name",  # Area path of the task
-        "System.IterationPath": "your_project_name",  # Iteration path of the task
-        "Microsoft.VSTS.Common.Priority": "1",  # Priority of the task
-        "System.Tags": "Tag1;Tag2"  # Tags for the task
-    }
-}
+# Function to create and update work item state
+def create_and_update_work_item(row):
+    title = row['Title']
+    description = row['Description']
+    assigned_to = row['AssignedTo']
+    priority = row['Priority']
+    
+    # Create a work item
+    work_item_payload = [
+        {
+            'op': 'add',
+            'path': '/fields/System.Title',
+            'value': title
+        },
+        {
+            'op': 'add',
+            'path': '/fields/System.Description',
+            'value': description
+        },
+        {
+            'op': 'add',
+            'path': '/fields/System.AssignedTo',
+            'value': assigned_to
+        },
+        {
+            'op': 'add',
+            'path': '/fields/Microsoft.VSTS.Common.Priority',
+            'value': priority
+        },
+        {
+            'op': 'add',
+            'path': '/fields/System.State',
+            'value': 'To Do'
+        }
+    ]
 
-# Make the POST request to create the task
-response = requests.post(url, headers=headers, json=[task_details])
+    response = requests.post(
+        create_work_item_url,
+        headers=headers,
+        auth=HTTPBasicAuth('', personal_access_token),
+        data=json.dumps(work_item_payload)
+    )
+    
+    if response.status_code == 200:
+        created_work_item = response.json()
+        work_item_id = created_work_item['id']
+        
+        # Update the state to 'Done'
+        update_state_url = f'{organization_url}/{project_name}/_apis/wit/workitems/{work_item_id}?api-version=6.0'
+        update_state_payload = [
+            {
+                'op': 'add',
+                'path': '/fields/System.State',
+                'value': 'Done'
+            }
+        ]
+        
+        update_response = requests.patch(
+            update_state_url,
+            headers=headers,
+            auth=HTTPBasicAuth('', personal_access_token),
+            data=json.dumps(update_state_payload)
+        )
+        
+        if update_response.status_code == 200:
+            print(f"Created and updated work item: {work_item_id}")
+        else:
+            print(f"Failed to update work item state: {work_item_id}, Status Code: {update_response.status_code}, Response: {update_response.text}")
+    else:
+        print(f"Failed to create work item, Status Code: {response.status_code}, Response: {response.text}")
 
-# Check if the request was successful
-if response.status_code == 200:
-    print("Task created successfully.")
-    print(response.json())
-else:
-    print("Failed to create task.")
-    print(response.text)
+# Iterate through each task and create/update work items
+for index, row in tasks_df.iterrows():
+    create_and_update_work_item(row)
+
+print("All tasks have been created and updated.")
